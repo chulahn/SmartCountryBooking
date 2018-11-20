@@ -15,3 +15,18 @@
   text-align: center;
   height: 40%;
 }
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: black;
+}
+
+.d3-tip {
+  text-align: center;
+  background: rgba(173, 216, 230, 0.6);
+}
+
+.tip-date {
+  font-weight: bold;
+}

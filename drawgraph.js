@@ -18,8 +18,14 @@ GLOBALS.tip = d3
   .tip()
   .attr("class", "d3-tip")
   .html(function(d) {
-    console.log(d);
-    return d;
+    var tipHTML = "<span class='tip-date'>";
+    tipHTML += d.date;
+    tipHTML += "</span><br/>";
+    tipHTML += "<span class='tip-count'>";
+    tipHTML += d.requestscount;
+    tipHTML += "</span>";
+
+    return tipHTML;
   });
 
 function getAxesDomain() {
@@ -156,7 +162,6 @@ $(document).ready(function() {
         console.log(d);
         var currentDate = d.date.toDate();
         console.log(currentDate);
-        console.log(xScale(currentDate));
         return xScale(currentDate);
       })
       .attr("cy", function(d) {
