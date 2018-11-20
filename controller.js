@@ -136,6 +136,7 @@ angular
           resizeAxes();
 
           drawPoints(GLOBALS.svg);
+          drawLine();
         })
         .error(function(err) {
           console.log(err);

@@ -200,4 +200,49 @@ $(document).ready(function() {
       .attr("fill-opacity", 1)
       .attr("r", "2");
   };
+
+  drawLine = function() {
+    var data = angular.element($("[ng-controller=dataController]")).scope()
+      .globalLocMonthData;
+    GLOBALS.svg
+      .selectAll(".avgLine")
+      .data(data)
+      .enter()
+      .append("line")
+
+      .attr("x1", function(d, i) {
+        if (i + 1 != data.length) {
+          return GLOBALS.xScale(d.date.toDate());
+        }
+      })
+      .attr("y1", function(d, i) {
+        if (i + 1 != data.length) {
+          return GLOBALS.yScale(d.requestscount);
+        }
+      })
+      .attr("x2", function(d, i) {
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.xScale(nextElem.date.toDate());
+        }
+      })
+      .attr("y2", function(d, i) {
+        if (i + 1 != data.length) {
+          var nextElem = data[i + 1];
+
+          if (nextElem) {
+            return GLOBALS.yScale(nextElem.requestscount);
+          }
+        } else {
+          console.log("HERE ", i);
+        }
+      })
+      .attr("class", "avgLine")
+      .style("stroke", function(d, i) {
+        var nextElem = data[i + 1];
+        var color = "black";
+        return color;
+      });
+  };
 });
