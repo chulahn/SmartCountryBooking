@@ -136,11 +136,17 @@ app.get("/test", function(req, res) {
             if (!globalData.after[k][currentDate]) {
               globalData.after[k][currentDate] = {};
             }
-            if (!globalData.after[k][currentDate][c]) {
-              globalData.after[k][currentDate][c] = [];
+            // if (!globalData.after[k][currentDate][c]) {
+            //   globalData.after[k][currentDate][c] = [];
+            // }
+
+            if (!globalData.after[k][currentDate][t]) {
+              globalData.after[k][currentDate][t] = [];
             }
 
-            globalData.after[k][currentDate][c].push(t);
+            // globalData.after[k][currentDate][c].push(t);
+
+            globalData.after[k][currentDate][t].push(c);
 
             globalStringData.push(debugString);
           });

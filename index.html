@@ -36,6 +36,19 @@
   </head>
   <body ng-app="app" ng-controller="dataController">
     <p>Date: <input type="text" id="datepicker" /></p>
+    <br />
+    <br />
+
+    <table>
+      <tr class="time-row" ng-repeat="(key, value) in testCalData">
+        <td class="time">{{ key }}</td>
+        <td>
+          <ul>
+            <li ng-repeat="v in value">{{ v }}</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
 
     <!-- Latest compiled and minified JavaScript -->
     <script
