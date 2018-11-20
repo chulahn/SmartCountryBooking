@@ -6,3 +6,12 @@
   background: red;
   border: 1px solid black;
 }
+
+#vizDiv {
+  position: relative;
+  width: 80%;
+  margin: 0 auto;
+  /*min-height: 200px;*/
+  text-align: center;
+  height: 40%;
+}

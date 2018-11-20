@@ -170,6 +170,23 @@ app.get("/test", function(req, res) {
   );
 });
 
+app.get("/stats", function(req, res) {
+  request(
+    "https://api.smartcountry-hacks.de/itdz/stats/customer/111/2016-06",
+    function(error, response, body) {
+      console.log(body);
+      var data = JSON.parse(body);
+      console.log(data);
+
+      data.forEach(function(day) {
+        console.log(day.date, day.requestscount);
+      });
+
+      res.send(data);
+    }
+  );
+});
+
 app.get("/style.css", function(req, res) {
   res.sendfile("style.css");
 });
@@ -178,6 +195,9 @@ app.get("/controller.js", function(req, res) {
   res.sendfile("controller.js");
 });
 
+app.get("/drawgraph.js", function(req, res) {
+  res.sendfile("drawgraph.js");
+});
 /*
   app.get("/ex", function(req, res) {
     MongoClient.connect(
