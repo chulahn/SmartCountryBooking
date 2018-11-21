@@ -1,15 +1,14 @@
 $(document).ready(function() {
+  $("#vizDiv2").hide();
   $(".yearDiv .btn > span").click(function() {
-    console.log(1);
     var year = $(this).html();
-    $(".clicked").removeClass("clicked");
+    $(".yearDiv .clicked").removeClass("clicked");
     $(this)
       .parent()
       .addClass("clicked");
     $("#year").html(year);
 
     var scope = angular.element($("[ng-controller=dataController]")).scope();
-    console.log(scope);
     switch (year) {
       case "2014":
         scope.globalSlice = scope.globalLocMonthData.slice(0, 1000);
@@ -36,6 +35,31 @@ $(document).ready(function() {
         break;
     }
   });
+
+  $(".typeDiv .btn > span").click(function() {
+    var graphType = $(this).html();
+    console.log(graphType);
+    $(".typeDiv .clicked").removeClass("clicked");
+    $(this)
+      .parent()
+      .addClass("clicked");
+
+    if (graphType === "All Clients") {
+      $("#vizDiv2").show();
+      $("#vizDiv").hide();
+    } else if (graphType === "Total Requests") {
+      $("#vizDiv").show();
+      $("#vizDiv2").hide();
+    }
+  });
+
+  function fillModal(date, location, time) {
+    $("#serviceInput").val("Anmeldung_Wohnung");
+    $("#dateInput").val(date);
+    $("#locationInput").val(location);
+    $("#timeInput").val(time);
+    $("#regModal").modal();
+  }
 });
 
 angular
@@ -51,6 +75,15 @@ angular
       $scope.globalSlice = {};
       var firstFreeDayUrl =
         "https://api.smartcountry-hacks.de/itdz/stats/firstfreeday/";
+
+      $scope.fillModal = function(date, location, time) {
+        $("#serviceInput").val("Anmeldung_Wohnung");
+        $("#dateInput").val($("#datepicker").val());
+        $("#locationInput").val(location);
+        $("#timeInput").val(time);
+        $("#regModal").modal();
+      };
+
       /*
         $http
           .get("/date")
@@ -87,59 +120,59 @@ angular
             console.log(err);
           });
       */
-      // $http
-      //   .get("/test")
-      //   .success(function(data) {
-      //     console.log("Successful connect ", data);
-      //     $scope.globalData = data;
+      $http
+        .get("/test")
+        .success(function(data) {
+          console.log("Successful connect ", data);
+          $scope.globalData = data;
 
-      //     console.log(Object.keys(data.after.Anmeldung_Wohnung));
-      //     /*
-      //       ["2018-12-7", "2018-12-14", "2018-11-14", "2018-12-11", "2018-12-5", "2018-12-10", "2018-12-13", "2018-12-6", "2018-12-3", "2018-12-12", "2018-12-4"]
-      //     */
-      //     var enableDays = Object.keys(data.after.Anmeldung_Wohnung);
+          console.log(Object.keys(data.after.Anmeldung_Wohnung));
+          /*
+            ["2018-12-7", "2018-12-14", "2018-11-14", "2018-12-11", "2018-12-5", "2018-12-10", "2018-12-13", "2018-12-6", "2018-12-3", "2018-12-12", "2018-12-4"]
+          */
+          var enableDays = Object.keys(data.after.Anmeldung_Wohnung);
 
-      //     // console.log(enableDays);
-      //     console.log(data.after.Anmeldung_Wohnung["2018-11-14"]);
-      //     $scope.testCalData = data.after.Anmeldung_Wohnung["2018-11-14"];
+          // console.log(enableDays);
+          console.log(data.after.Anmeldung_Wohnung["2018-11-14"]);
+          $scope.testCalData = data.after.Anmeldung_Wohnung["2018-11-14"];
 
-      //     // enableDays.forEach(function(d) {
-      //     //   $scope.testCalData = data.after.Anmeldung_Wohnung[d];
-      //     // });
+          // enableDays.forEach(function(d) {
+          //   $scope.testCalData = data.after.Anmeldung_Wohnung[d];
+          // });
 
-      //     jQuery(function() {
-      //       // var enableDays = ["7-8-2013"];
-      //       // var enableDays = ["2018-11-08"];
+          jQuery(function() {
+            // var enableDays = ["7-8-2013"];
+            // var enableDays = ["2018-11-08"];
 
-      //       function enableAllTheseDays(date) {
-      //         // var sdate = $.datepicker.formatDate("d-m-yy", date);
-      //         var sdate = $.datepicker.formatDate("yy-m-d", date);
-      //         if ($.inArray(sdate, enableDays) != -1) {
-      //           return [true];
-      //         }
-      //         return [false];
-      //       }
+            function enableAllTheseDays(date) {
+              // var sdate = $.datepicker.formatDate("d-m-yy", date);
+              var sdate = $.datepicker.formatDate("yy-m-d", date);
+              if ($.inArray(sdate, enableDays) != -1) {
+                return [true];
+              }
+              return [false];
+            }
 
-      //       $("#datepicker").datepicker({
-      //         dateFormat: "yy-mm-d",
-      //         beforeShowDay: enableAllTheseDays,
-      //         onSelect: function(dateText, inst) {
-      //           var date = $(this).val();
-      //           $scope.$apply(function() {
-      //             console.log(date);
-      //             console.log($scope.globalData.after.Anmeldung_Wohnung);
+            $("#datepicker").datepicker({
+              dateFormat: "yy-mm-d",
+              beforeShowDay: enableAllTheseDays,
+              onSelect: function(dateText, inst) {
+                var date = $(this).val();
+                $scope.$apply(function() {
+                  console.log(date);
+                  console.log($scope.globalData.after.Anmeldung_Wohnung);
 
-      //             console.log($scope.globalData.after.Anmeldung_Wohnung[date]);
-      //             $scope.testCalData =
-      //               $scope.globalData.after.Anmeldung_Wohnung[date];
-      //           });
-      //         }
-      //       });
-      //     });
-      //   })
-      //   .error(function(err) {
-      //     console.log(err);
-      //   });
+                  console.log($scope.globalData.after.Anmeldung_Wohnung[date]);
+                  $scope.testCalData =
+                    $scope.globalData.after.Anmeldung_Wohnung[date];
+                });
+              }
+            });
+          });
+        })
+        .error(function(err) {
+          console.log(err);
+        });
 
       $http
         .get("/stats/all")

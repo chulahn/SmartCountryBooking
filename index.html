@@ -32,7 +32,9 @@
     <title>SmartBook</title>
   </head>
   <body ng-app="app" ng-controller="dataController">
-    <p>Date: <input type="text" id="datepicker" /></p>
+    <section class="dateDiv">
+      <p>Date: <input type="text" id="datepicker" /></p>
+    </section>
     <br />
     <section class="typeDiv">
       <button class="btn btn-secondary">
@@ -41,7 +43,7 @@
       <button class="btn btn-secondary">
         <span class="graph-type" id="missedcount">Missed Clients</span>
       </button>
-      <button class="btn btn-success">
+      <button class="btn btn-secondary clicked">
         <span class="graph-type" id="requestcount">Total Requests</span>
       </button>
     </section>
@@ -63,17 +65,57 @@
     </section>
 
     <div id="vizDiv"></div>
+    <div id="vizDiv2"></div>
+    <div id="vizDiv3"></div>
     <table>
       <tr class="time-row" ng-repeat="(key, value) in testCalData">
         <td class="time">{{ key }}</td>
         <td>
           <ul>
-            <li ng-repeat="v in value">{{ v }}</li>
+            <li
+              ng-repeat="v in value"
+              ng-click="fillModal($('#datepicker').val(),v,key)"
+            >
+              {{ v }}
+            </li>
           </ul>
         </td>
       </tr>
     </table>
 
+    <!-- Modal -->
+    <div id="regModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              &times;
+            </button>
+            <h4 class="modal-title">Register Service</h4>
+          </div>
+          <div class="modal-body">
+            <h3>Service :</h3>
+            <input id="serviceInput" /><br />
+            <h3>Date :</h3>
+            <input id="dateInput" /><br />
+
+            <h3>Location :</h3>
+            <input id="locationInput" /><br />
+            <h3>Time:</h3>
+            <input id="timeInput" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button type="button" class="btn btn-success" data-dismiss="modal">
+              Register
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Latest compiled and minified JavaScript -->
     <script
       src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"

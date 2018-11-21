@@ -58,6 +58,15 @@ function getAxesDomain() {
     return parseInt(d.requestscount);
   });
 
+  GLOBALS.min2 = d3.min(data, function(d) {
+    // console.log(d.requestscount);
+    return parseInt(d.clientscount);
+  });
+  // console.log(GLOBALS.minPrice);
+  GLOBALS.max2 = d3.max(data, function(d) {
+    return parseInt(d.clientscount);
+  });
+
   // console.log(GLOBALS.minPrice, GLOBALS.maxPrice);
 }
 function setAxesScales() {
@@ -86,6 +95,18 @@ function setAxesScales() {
     .scale(yScale)
     .orient("left")
     .ticks(5);
+
+  var yScale2 = (GLOBALS.yScale2 =
+    d3.scale
+      .linear()
+      .domain([GLOBALS.min2 || 0, GLOBALS.max2 || GLOBALS.max2])
+      .range([GLOBALS.dimens.h - GLOBALS.padding.y, GLOBALS.padding.y]) ||
+    GLOBALS.yScale2);
+  var yAxis2 = (GLOBALS.yAxis2 = d3.svg.axis());
+  yAxis2
+    .scale(yScale2)
+    .orient("left")
+    .ticks(5);
 }
 
 function setGraphDimens(create) {
@@ -102,8 +123,15 @@ function setGraphDimens(create) {
       .append("svg")
       .attr("width", dimens.w)
       .attr("height", 300));
+
+    var svg2 = (GLOBALS.svg2 = d3
+      .select("#vizDiv2")
+      .append("svg")
+      .attr("width", dimens.w)
+      .attr("height", 300));
   } else {
     GLOBALS.svg.attr("height", dimens.h).attr("width", dimens.w);
+    GLOBALS.svg2.attr("height", dimens.h).attr("width", dimens.w);
   }
 
   getAxesDomain();
@@ -139,6 +167,21 @@ $(document).ready(function() {
       .attr("class", "y axis")
       .attr("transform", "translate(" + GLOBALS.padding.x + ",0 )")
       .call(GLOBALS.yAxis);
+
+    GLOBALS.svg2
+      .append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate(" + GLOBALS.padding.x + ",0 )")
+      .call(GLOBALS.yAxis2);
+
+    GLOBALS.svg2
+      .append("g")
+      .attr("class", "x axis")
+      .attr(
+        "transform",
+        "translate(0," + (GLOBALS.dimens.h - GLOBALS.padding.y) + ")"
+      )
+      .call(GLOBALS.xAxis);
   }
 
   drawPoints = function(svg) {
@@ -148,9 +191,9 @@ $(document).ready(function() {
     var yScale = GLOBALS.yScale;
     var tip = GLOBALS.tip;
 
-    GLOBALS.svg.call(tip);
+    svg.call(tip);
 
-    GLOBALS.svg
+    svg
       .selectAll(".dataPoint")
       .data(data)
       .enter()
@@ -168,6 +211,60 @@ $(document).ready(function() {
       })
       .attr("cy", function(d) {
         return yScale(d.requestscount);
+      })
+      .attr("r", function(d) {
+        return 7;
+      })
+      .attr("id", function(d) {
+        return d.id;
+      })
+      .attr("fill-opacity", 0.6)
+      .attr("fill", "green")
+
+      .on("mouseover", function(d) {
+        d3.select(this)
+          .transition()
+          .duration(500)
+          .attr("r", 10)
+          .attr("class", "hover dataPoint");
+        tip.show(d);
+      })
+      .on("mouseout", function(d) {
+        d3.select(this)
+          .transition()
+          .duration(500)
+          .attr("r", 2)
+          .attr("class", "dataPoint");
+        tip.hide(d);
+      })
+
+      //after showing point minimize
+      .transition()
+      .duration(1000)
+      .attr("fill", "black")
+      .attr("fill-opacity", 1)
+      .attr("r", "2");
+
+    var yScale2 = GLOBALS.yScale2;
+
+    GLOBALS.svg2
+      .selectAll(".dataPoint")
+      .data(data)
+      .enter()
+      .append("a")
+      .attr("xlink:href", function(d) {
+        return "#" + data.indexOf(d);
+      })
+      .append("circle")
+      .attr("class", "dataPoint")
+      .attr("cx", function(d) {
+        // console.log(d);
+        var currentDate = d.date.toDate();
+        // console.log(currentDate);
+        return xScale(currentDate);
+      })
+      .attr("cy", function(d) {
+        return yScale2(d.clientscount);
       })
       .attr("r", function(d) {
         return 7;
@@ -255,6 +352,41 @@ $(document).ready(function() {
         var color = "black";
         return color;
       });
+
+    GLOBALS.svg2
+      .selectAll(".avgLine")
+      .data(data)
+      .enter()
+      .append("line")
+
+      .attr("x1", function(d, i) {
+        if (i + 1 != data.length) {
+          return GLOBALS.xScale(d.date.toDate());
+        }
+      })
+      .attr("y1", function(d, i) {
+        if (i + 1 != data.length) {
+          return GLOBALS.yScale2(d.clientscount);
+        }
+      })
+      .attr("x2", function(d, i) {
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.xScale(nextElem.date.toDate());
+        }
+      })
+      .attr("y2", function(d, i) {
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.yScale2(nextElem.clientscount);
+        }
+      })
+      .attr("class", "avgLine")
+      .style("stroke", function(d, i) {
+        var nextElem = data[i + 1];
+      });
   };
 });
 
@@ -264,8 +396,12 @@ function updateViz(addingNewData) {
   updateAxes();
 
   var svg = GLOBALS.svg;
+  var svg2 = GLOBALS.svg2;
   var dataPoints = svg.selectAll(".dataPoint").data(data);
   var lines = GLOBALS.svg.selectAll(".avgLine").data(data);
+
+  var dp2 = svg2.selectAll(".dataPoint").data(data);
+  var lines2 = svg2.selectAll(".avgLine").data(data);
 
   dataPoints
     .exit()
@@ -275,7 +411,17 @@ function updateViz(addingNewData) {
     .transition()
     .attr("r", 0)
     .remove();
+  dp2
+    .exit()
+    .transition()
+    .attr("r", 4)
+    .attr("fill", "red")
+    .transition()
+    .attr("r", 0)
+    .remove();
+
   lines.exit().remove();
+  lines2.exit().remove();
 
   addingNewData === undefined
     ? moveOldPoints()
@@ -288,9 +434,12 @@ function moveOldPoints(addingNewData) {
 
   var dataPoints = GLOBALS.svg.selectAll(".dataPoint").data(data);
   var avgDataLines = GLOBALS.svg.selectAll(".avgLine").data(data);
+  var dp2 = GLOBALS.svg2.selectAll(".dataPoint").data(data);
+  var adl2 = GLOBALS.svg2.selectAll(".avgLine").data(data);
 
   var xScale = GLOBALS.xScale;
   var yScale = GLOBALS.yScale;
+  var yScale2 = GLOBALS.yScale2;
 
   avgDataLines.each(function(d) {
     var currentLine = d3.select(this);
@@ -354,7 +503,7 @@ function moveOldPoints(addingNewData) {
       var currentY = parseInt(currentPoint.attr("cy"));
 
       var newX = parseInt(GLOBALS.xScale(currentDate));
-      var newY = parseInt(GLOBALS.yScale(d.requestscount));
+      var newY = parseInt(GLOBALS.yScale2(d.clientscount));
 
       if (currentX !== newX || currentY !== newY) {
         console.log("x ", currentX, newX, " y ", currentY, newY);
@@ -369,7 +518,7 @@ function moveOldPoints(addingNewData) {
             return GLOBALS.xScale(currentDate);
           })
           .attr("cy", function(d) {
-            return GLOBALS.yScale(d.finalPrice);
+            return GLOBALS.yScale2(d.finalPrice);
           })
           .attr("id", function(d) {
             return d.id;
@@ -395,6 +544,120 @@ function moveOldPoints(addingNewData) {
         })
         .attr("cy", function(d) {
           return GLOBALS.yScale(d.requestscount);
+        })
+        .attr("id", function(d) {
+          return d.id;
+        });
+    }
+
+    pNode.attr("href", function(d) {
+      return "#" + data.indexOf(d);
+    });
+  });
+
+  adl2.each(function(d) {
+    var currentLine = d3.select(this);
+
+    currentLine
+      .transition()
+      .duration(500)
+      .attr("x1", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          console.log(data.indexOf(d));
+          return GLOBALS.xScale(d.date.toDate());
+        }
+      })
+      .attr("y1", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.yScale2(d.clientscount);
+        }
+      })
+      .attr("x2", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.xScale(nextElem.date.toDate());
+        }
+      })
+      .attr("y2", function(d) {
+        var i = data.indexOf(d);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.yScale2(nextElem.clientscount);
+        }
+      })
+      .style("stroke", function(d) {
+        var i = data.indexOf(d);
+
+        var nextElem = data[i + 1];
+        var color = "black";
+
+        return color;
+      });
+  });
+
+  dp2.each(function(d) {
+    var currentPoint = d3.select(this);
+    var pNode = d3.select(this.parentNode);
+    var currentDate = d.date.toDate();
+
+    if (addingNewData !== undefined) {
+      var currentX = parseInt(currentPoint.attr("cx"));
+      var currentY = parseInt(currentPoint.attr("cy"));
+
+      var newX = parseInt(GLOBALS.xScale(currentDate));
+      var newY = parseInt(GLOBALS.yScale(d.clientscount));
+
+      if (currentX !== newX || currentY !== newY) {
+        console.log("x ", currentX, newX, " y ", currentY, newY);
+
+        currentPoint
+          .transition()
+          .duration(500)
+          .attr("fill", "yellow")
+          .attr("r", "10")
+          .attr("fill-opacity", 0.6)
+          .attr("cx", function(d) {
+            return GLOBALS.xScale(currentDate);
+          })
+          .attr("cy", function(d) {
+            return GLOBALS.yScale2(d.clientscount);
+          })
+          .attr("id", function(d) {
+            return d.id;
+          })
+          .transition()
+          .duration(1000)
+          .attr("fill", "black")
+          .attr("r", "2")
+          .attr("fill-opacity", 1);
+      }
+    } else {
+      currentPoint
+        .transition()
+        .duration(500)
+        .attr("cx", function(d) {
+          if (GLOBALS.small === true) {
+            var center = (GLOBALS.dimens.w - GLOBALS.padding.x) / 2;
+            return center;
+          } else {
+            var currentDate = d.date.toDate();
+            return GLOBALS.xScale(currentDate);
+          }
+        })
+        .attr("cy", function(d) {
+          return GLOBALS.yScale(d.clientscount);
         })
         .attr("id", function(d) {
           return d.id;

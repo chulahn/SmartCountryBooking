@@ -2,7 +2,8 @@ body {
   background: rgba(33, 119, 250, 0.6);
 }
 
-#vizDiv {
+#vizDiv,
+#vizDiv2 {
   background: white;
   border-radius: 10px;
 }
@@ -15,7 +16,8 @@ body {
   border: 1px solid black;
 }
 
-#vizDiv {
+#vizDiv,
+#vizDiv2 {
   position: relative;
   width: 80%;
   margin: 0 auto;
@@ -64,4 +66,26 @@ body {
 .clicked {
   background: rgb(18, 177, 13) !important;
   color: white !important;
+}
+
+table {
+  margin: 0 auto;
+  margin-top: 25px;
+}
+
+table .time {
+  color: white;
+}
+
+table tbody {
+  border-radius: 10px;
+}
+
+#regModal h3 {
+  display: inline;
+}
+
+.dateDiv {
+  margin-top: 20px;
+  text-align: center;
 }
