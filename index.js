@@ -3,9 +3,8 @@ var app = express();
 
 var mongo = require("mongodb");
 var MongoClient = mongo.MongoClient;
-// var databaseURL =
-// "mongodb://admin:Fitadmin@ds121696.mlab.com:21696/exercise-journal";
-// var ObjectId = require("mongodb").ObjectId;
+var databaseURL = "mongodb://admin:admin1@ds039037.mlab.com:39037/smartcountry";
+var ObjectId = require("mongodb").ObjectId;
 
 var request = require("request");
 var async = require("async");
@@ -207,35 +206,86 @@ var days = [
   }
 ];
 
+request("https://api.smartcountry-hacks.de/itdz/stats/service", function(
+  error,
+  response,
+  body
+) {
+  days = JSON.parse(body);
+  // console.log(days.length);
+  days = days.slice(0, 100);
+});
+
 app.get("/stats/all", function(req, res) {
   var allStats = [];
 
-  async.each(
-    days,
-    function(day, callback) {
-      // Perform operation on day here.
-      console.log("Processing month " + day.date);
+  MongoClient.connect(
+    databaseURL,
+    function(err, client) {
+      if (client) {
+        var db = client.db("smartcountry");
+        var requestTable = db.collection("request");
 
-      var baseURL = "https://api.smartcountry-hacks.de/itdz/stats/customer/";
-      baseURL += day.subjectId + "/";
-      baseURL += day.date;
+        async.each(
+          days,
+          function(day, callback) {
+            // Perform operation on day here.
+            console.log("Processing month " + day.date);
 
-      request(baseURL, function(error, response, body) {
-        var data = JSON.parse(body);
-        console.log(data[0]);
-        allStats = allStats.concat(data);
-        callback();
-      });
-    },
-    function(err) {
-      // if any of the day processing produced an error, err would equal that error
-      if (err) {
-        // One of the iterations produced an error.
-        // All processing will now stop.
-        console.log("A day failed to process");
+            var baseURL =
+              "https://api.smartcountry-hacks.de/itdz/stats/customer/";
+            baseURL += day.subjectId + "/";
+            baseURL += day.date;
+
+            request(baseURL, function(error, response, body) {
+              if (!body) {
+                console.log(day);
+                callback(error, day);
+              }
+              var data = JSON.parse(body);
+              console.log(data[0]);
+              allStats = allStats.concat(data);
+              callback();
+            });
+          },
+          function(err, day) {
+            // if any of the day processing produced an error, err would equal that error
+            if (err) {
+              // One of the iterations produced an error.
+              // All processing will now stop.
+              console.log("A day failed to process");
+              console.log(err);
+              console.log(day);
+              if (err.code === "ETIMEOUT") {
+              }
+            } else {
+              console.log("All days have been processed successfully");
+              async.each(
+                allStats,
+                function(s, callback) {
+                  console.log(s);
+                  requestTable.insert(s, function(err, results) {
+                    if (err) {
+                      console.log("Insert workout error");
+                      console.log(err);
+                      res.status(400).send(err);
+                    } else {
+                      console.log("Successful insert");
+                      console.log(results);
+                    }
+                  });
+                },
+                function(err, day) {
+                  console.log(err);
+                }
+              );
+              res.send(allStats);
+            }
+          }
+        );
       } else {
-        console.log("All days have been processed successfully");
-        res.send(allStats);
+        console.log("Error connecting to Database");
+        console.log(err);
       }
     }
   );

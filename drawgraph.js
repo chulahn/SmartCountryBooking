@@ -202,14 +202,20 @@ $(document).ready(function() {
   };
 
   drawLine = function() {
+    console.log("DRAWLINE");
     var data = angular.element($("[ng-controller=dataController]")).scope()
       .globalLocMonthData;
+    // console.log(data);
+    // data = data.sort(function(a, b) {
+    //   console.log(a.date.toDate(), b.date.toDate());
+    //   if (a.date.toDate() > b.date.toDate()) {
+    //     return 1;
+    //   }
+    //   if (a.date.toDate() < b.date.toDate()) {
+    //     return -1;
+    //   }
+    // });
 
-    data = data.sort(function(a, b) {
-      if (a.date.toDate() > b.date.toDate()) {
-        return 1;
-      }
-    });
     console.log(data);
     GLOBALS.svg
       .selectAll(".avgLine")
