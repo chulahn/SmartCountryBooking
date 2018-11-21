@@ -8,6 +8,7 @@ var MongoClient = mongo.MongoClient;
 // var ObjectId = require("mongodb").ObjectId;
 
 var request = require("request");
+var async = require("async");
 
 var bodyParser = require("body-parser");
 app.use(bodyParser.json()); // to support JSON-encoded bodies
@@ -183,6 +184,59 @@ app.get("/stats", function(req, res) {
       });
 
       res.send(data);
+    }
+  );
+});
+
+var days = [
+  {
+    subjectId: "101",
+    date: "2013-01"
+  },
+  {
+    subjectId: "101",
+    date: "2013-02"
+  },
+  {
+    subjectId: "101",
+    date: "2013-03"
+  },
+  {
+    subjectId: "101",
+    date: "2013-04"
+  }
+];
+
+app.get("/stats/all", function(req, res) {
+  var allStats = [];
+
+  async.each(
+    days,
+    function(day, callback) {
+      // Perform operation on day here.
+      console.log("Processing month " + day.date);
+
+      var baseURL = "https://api.smartcountry-hacks.de/itdz/stats/customer/";
+      baseURL += day.subjectId + "/";
+      baseURL += day.date;
+
+      request(baseURL, function(error, response, body) {
+        var data = JSON.parse(body);
+        console.log(data[0]);
+        allStats = allStats.concat(data);
+        callback();
+      });
+    },
+    function(err) {
+      // if any of the day processing produced an error, err would equal that error
+      if (err) {
+        // One of the iterations produced an error.
+        // All processing will now stop.
+        console.log("A day failed to process");
+      } else {
+        console.log("All days have been processed successfully");
+        res.send(allStats);
+      }
     }
   );
 });
