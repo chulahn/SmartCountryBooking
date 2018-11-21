@@ -204,6 +204,13 @@ $(document).ready(function() {
   drawLine = function() {
     var data = angular.element($("[ng-controller=dataController]")).scope()
       .globalLocMonthData;
+
+    data = data.sort(function(a, b) {
+      if (a.date.toDate() > b.date.toDate()) {
+        return 1;
+      }
+    });
+    console.log(data);
     GLOBALS.svg
       .selectAll(".avgLine")
       .data(data)
@@ -228,14 +235,10 @@ $(document).ready(function() {
         }
       })
       .attr("y2", function(d, i) {
-        if (i + 1 != data.length) {
-          var nextElem = data[i + 1];
+        var nextElem = data[i + 1];
 
-          if (nextElem) {
-            return GLOBALS.yScale(nextElem.requestscount);
-          }
-        } else {
-          console.log("HERE ", i);
+        if (nextElem) {
+          return GLOBALS.yScale(nextElem.requestscount);
         }
       })
       .attr("class", "avgLine")
