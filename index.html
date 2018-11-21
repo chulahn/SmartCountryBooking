@@ -33,6 +33,7 @@
   </head>
   <body ng-app="app" ng-controller="dataController">
     <section class="dateDiv">
+      <h1>SmartBook</h1>
       <p>Date: <input type="text" id="datepicker" /></p>
     </section>
     <br />
@@ -59,7 +60,7 @@
         <span class="graph-nav" id="t016">2016</span>
       </button>
       <br />
-      <h2>Year : <span id="year">2013-2018</span></h2>
+      <h3>Year : <span id="year">2013-2018</span></h3>
       <br />
       <!-- <h1>Location : <span id="location"></span></h1> -->
     </section>
@@ -67,10 +68,11 @@
     <div id="vizDiv"></div>
     <div id="vizDiv2"></div>
     <div id="vizDiv3"></div>
+    <section class="schedTypeDiv"><h4>Anmeldung_Wohnung</h4></section>
     <table>
       <tr class="time-row" ng-repeat="(key, value) in testCalData">
         <td class="time">{{ key }}</td>
-        <td>
+        <td class="locations">
           <ul>
             <li
               ng-repeat="v in value"
