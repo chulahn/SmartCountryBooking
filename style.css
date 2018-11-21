@@ -1,3 +1,10 @@
+body {
+  background: rgb(74, 107, 199);
+}
+
+#vizDiv {
+  background: white;
+}
 .time-row {
   border: 1px solid black;
 }
@@ -31,27 +38,25 @@
   font-weight: bold;
 }
 
-.graph-nav {
-  /* color: blue; */
-}
-
-.graph-type {
-}
-
-h1 {
-  display: inline-block;
-  padding-right: 20px;
-}
-
-.graph-nav:hover {
-  text-decoration: underline;
-}
-
-.yearDiv,
-.typeDiv {
+.typeDiv,
+.yearDiv {
   text-align: center;
 }
 
-.typeDiv {
-  color: blue;
+.yearDiv {
+  color: white;
+}
+
+.yearDiv .btn {
+  color: gray;
+}
+
+.dataPoint {
+  fill: red;
+  stroke: red;
+}
+
+.avgLine {
+  fill: rgba(45, 119, 231, 0.2);
+  stroke: rgba(45, 119, 231, 0.2) !important;
 }
