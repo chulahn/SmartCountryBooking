@@ -34,9 +34,11 @@ function getAxesDomain() {
       angular.element($("[ng-controller=dataController]")) &&
       angular.element($("[ng-controller=dataController]")).scope() &&
       angular.element($("[ng-controller=dataController]")).scope()
-        .globalLocMonthData) ||
+        .globalSlice) ||
     [];
-  // console.log(data);
+  var data = angular.element($("[ng-controller=dataController]")).scope()
+    .globalSlice;
+  console.log(data.length);
   GLOBALS.earliestDate = d3.min(data, function(d) {
     var currentDate = d.date.toDate() || GLOBALS.earliestDate;
     return currentDate;
@@ -141,7 +143,7 @@ $(document).ready(function() {
 
   drawPoints = function(svg) {
     var data = angular.element($("[ng-controller=dataController]")).scope()
-      .globalLocMonthData;
+      .globalSlice;
     var xScale = GLOBALS.xScale;
     var yScale = GLOBALS.yScale;
     var tip = GLOBALS.tip;
@@ -159,9 +161,9 @@ $(document).ready(function() {
       .append("circle")
       .attr("class", "dataPoint")
       .attr("cx", function(d) {
-        console.log(d);
+        // console.log(d);
         var currentDate = d.date.toDate();
-        console.log(currentDate);
+        // console.log(currentDate);
         return xScale(currentDate);
       })
       .attr("cy", function(d) {
@@ -204,7 +206,7 @@ $(document).ready(function() {
   drawLine = function() {
     console.log("DRAWLINE");
     var data = angular.element($("[ng-controller=dataController]")).scope()
-      .globalLocMonthData;
+      .globalSlice;
     // console.log(data);
     // data = data.sort(function(a, b) {
     //   console.log(a.date.toDate(), b.date.toDate());
@@ -255,3 +257,176 @@ $(document).ready(function() {
       });
   };
 });
+
+function updateViz(addingNewData) {
+  var data = angular.element($("[ng-controller=dataController]")).scope()
+    .globalSlice;
+  updateAxes();
+
+  var svg = GLOBALS.svg;
+  var dataPoints = svg.selectAll(".dataPoint").data(data);
+  var lines = GLOBALS.svg.selectAll(".avgLine").data(data);
+
+  dataPoints
+    .exit()
+    .transition()
+    .attr("r", 4)
+    .attr("fill", "red")
+    .transition()
+    .attr("r", 0)
+    .remove();
+  lines.exit().remove();
+
+  addingNewData === undefined
+    ? moveOldPoints()
+    : moveOldPoints("addingNewData");
+}
+
+function moveOldPoints(addingNewData) {
+  var scope = angular.element($("[ng-controller=dataController]")).scope();
+  var data = scope.globalSlice;
+
+  var dataPoints = GLOBALS.svg.selectAll(".dataPoint").data(data);
+  var avgDataLines = GLOBALS.svg.selectAll(".avgLine").data(data);
+
+  var xScale = GLOBALS.xScale;
+  var yScale = GLOBALS.yScale;
+
+  avgDataLines.each(function(d) {
+    var currentLine = d3.select(this);
+
+    currentLine
+      .transition()
+      .duration(500)
+      .attr("x1", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          console.log(data.indexOf(d));
+          return GLOBALS.xScale(d.date.toDate());
+        }
+      })
+      .attr("y1", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.yScale(d.requestscount);
+        }
+      })
+      .attr("x2", function(d) {
+        var i = data.indexOf(d);
+        console.log(i, data.length);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.xScale(nextElem.date.toDate());
+        }
+      })
+      .attr("y2", function(d) {
+        var i = data.indexOf(d);
+        var nextElem = data[i + 1];
+
+        if (nextElem) {
+          return GLOBALS.yScale(nextElem.requestscount);
+        }
+      })
+      .style("stroke", function(d) {
+        var i = data.indexOf(d);
+
+        var nextElem = data[i + 1];
+        var color = "black";
+
+        return color;
+      });
+  });
+
+  dataPoints.each(function(d) {
+    var currentPoint = d3.select(this);
+    var pNode = d3.select(this.parentNode);
+    var currentDate = d.date.toDate();
+
+    if (addingNewData !== undefined) {
+      var currentX = parseInt(currentPoint.attr("cx"));
+      var currentY = parseInt(currentPoint.attr("cy"));
+
+      var newX = parseInt(GLOBALS.xScale(currentDate));
+      var newY = parseInt(GLOBALS.yScale(d.requestscount));
+
+      if (currentX !== newX || currentY !== newY) {
+        console.log("x ", currentX, newX, " y ", currentY, newY);
+
+        currentPoint
+          .transition()
+          .duration(500)
+          .attr("fill", "yellow")
+          .attr("r", "10")
+          .attr("fill-opacity", 0.6)
+          .attr("cx", function(d) {
+            return GLOBALS.xScale(currentDate);
+          })
+          .attr("cy", function(d) {
+            return GLOBALS.yScale(d.finalPrice);
+          })
+          .attr("id", function(d) {
+            return d.id;
+          })
+          .transition()
+          .duration(1000)
+          .attr("fill", "black")
+          .attr("r", "2")
+          .attr("fill-opacity", 1);
+      }
+    } else {
+      currentPoint
+        .transition()
+        .duration(500)
+        .attr("cx", function(d) {
+          if (GLOBALS.small === true) {
+            var center = (GLOBALS.dimens.w - GLOBALS.padding.x) / 2;
+            return center;
+          } else {
+            var currentDate = d.date.toDate();
+            return GLOBALS.xScale(currentDate);
+          }
+        })
+        .attr("cy", function(d) {
+          return GLOBALS.yScale(d.requestscount);
+        })
+        .attr("id", function(d) {
+          return d.id;
+        });
+    }
+
+    pNode.attr("href", function(d) {
+      return "#" + data.indexOf(d);
+    });
+  });
+}
+
+function updateAxes() {
+  setGraphDimens();
+  moveOldPoints();
+  resizeAxes();
+}
+
+function resizeAxes() {
+  GLOBALS.svg
+    .select(".x.axis")
+    .transition()
+    .duration(1000)
+    .attr(
+      "transform",
+      "translate(0," + (GLOBALS.dimens.h - GLOBALS.padding.y) + ")"
+    )
+    .call(GLOBALS.xAxis);
+  GLOBALS.svg
+    .select(".y.axis")
+    .transition()
+    .duration(1000)
+    .attr("transform", "translate(" + GLOBALS.padding.x + ",0 )")
+    .call(GLOBALS.yAxis);
+}

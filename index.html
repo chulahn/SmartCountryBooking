@@ -34,10 +34,34 @@
   <body ng-app="app" ng-controller="dataController">
     <p>Date: <input type="text" id="datepicker" /></p>
     <br />
+    <section class="typeDiv">
+      <button class="btn btn-secondary">
+        <span class="graph-type" id="clientscount">All Clients</span>
+      </button>
+      <button class="btn btn-secondary">
+        <span class="graph-type" id="missedcount">Missed Clients</span>
+      </button>
+      <button class="btn btn-success">
+        <span class="graph-type" id="requestcount">Total Requests</span>
+      </button>
+    </section>
     <br />
-    <h1>Year : <span id="year"></span></h1>
-    <br />
-    <h1>Location : <span id="location"></span></h1>
+    <section class="yearDiv">
+      <button class="btn btn-secondary">
+        <span class="graph-nav" id="t014">2014</span>
+      </button>
+      <button class="btn btn-secondary">
+        <span class="graph-nav" id="t015">2015</span>
+      </button>
+      <button class="btn btn-secondary">
+        <span class="graph-nav" id="t016">2016</span>
+      </button>
+      <br />
+      <h1>Year : <span id="year">2013-2018</span></h1>
+      <br />
+      <!-- <h1>Location : <span id="location"></span></h1> -->
+    </section>
+
     <div id="vizDiv"></div>
     <table>
       <tr class="time-row" ng-repeat="(key, value) in testCalData">

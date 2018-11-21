@@ -30,3 +30,28 @@
 .tip-date {
   font-weight: bold;
 }
+
+.graph-nav {
+  /* color: blue; */
+}
+
+.graph-type {
+}
+
+h1 {
+  display: inline-block;
+  padding-right: 20px;
+}
+
+.graph-nav:hover {
+  text-decoration: underline;
+}
+
+.yearDiv,
+.typeDiv {
+  text-align: center;
+}
+
+.typeDiv {
+  color: blue;
+}

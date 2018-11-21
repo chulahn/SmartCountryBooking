@@ -1,3 +1,38 @@
+$(document).ready(function() {
+  $(".graph-nav").click(function() {
+    var year = $(this).html();
+    $("#year").html(year);
+
+    var scope = angular.element($("[ng-controller=dataController]")).scope();
+    console.log(scope);
+    switch (year) {
+      case "2014":
+        scope.globalSlice = scope.globalLocMonthData.slice(0, 1000);
+        scope.$apply();
+        updateViz();
+
+        break;
+
+      case "2015":
+        console.log(2015);
+        scope.globalSlice = scope.globalLocMonthData.slice(1000, 1200);
+        scope.$apply();
+
+        updateViz();
+
+        break;
+
+      case "2016":
+        console.log(2016);
+        scope.globalSlice = scope.globalLocMonthData.slice(1200, 1800);
+        scope.$apply();
+
+        updateViz();
+        break;
+    }
+  });
+});
+
 angular
   .module("app", [])
 
@@ -8,6 +43,7 @@ angular
       $scope.testCalData = {};
       $scope.globalData = {};
       $scope.globalLocMonthData = {};
+      $scope.globalSlice = {};
       var firstFreeDayUrl =
         "https://api.smartcountry-hacks.de/itdz/stats/firstfreeday/";
       /*
@@ -106,7 +142,7 @@ angular
           console.log("Successful connect ", data);
 
           $scope.globalLocMonthData = data = data.sort(function(a, b) {
-            console.log(a.date.toDate(), b.date.toDate());
+            // console.log(a.date.toDate(), b.date.toDate());
             if (a.date.toDate() > b.date.toDate()) {
               return 1;
             }
@@ -114,34 +150,17 @@ angular
               return -1;
             }
           });
-          $scope.globalLocMonthData = data = data.slice(0, 505);
-          console.log("getting axes domain");
+          $scope.globalSlice = data;
+          // console.log("getting axes domain");
           GLOBALS.dimens = {
             w: $("#vizDiv").width() * 0.95,
             h: $("#vizDiv").height() * 0.95
           };
-
           setGraphDimens();
           // getAxesDomain();
-          console.log("gotaxes in intia");
+          // console.log("gotaxes in intia");
           // setAxesScales();
-          function resizeAxes() {
-            GLOBALS.svg
-              .select(".x.axis")
-              .transition()
-              .duration(1000)
-              .attr(
-                "transform",
-                "translate(0," + (GLOBALS.dimens.h - GLOBALS.padding.y) + ")"
-              )
-              .call(GLOBALS.xAxis);
-            GLOBALS.svg
-              .select(".y.axis")
-              .transition()
-              .duration(1000)
-              .attr("transform", "translate(" + GLOBALS.padding.x + ",0 )")
-              .call(GLOBALS.yAxis);
-          }
+
           resizeAxes();
 
           drawPoints(GLOBALS.svg);

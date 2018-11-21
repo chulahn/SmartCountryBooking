@@ -226,6 +226,11 @@ app.get("/stats/all", function(req, res) {
         var db = client.db("smartcountry");
         var requestTable = db.collection("request");
 
+        // requestTable.find({}).toArray(function(err, results) {
+        //   console.log(results.length);
+        //   res.send(results);
+        // });
+
         async.each(
           days,
           function(day, callback) {
@@ -264,16 +269,16 @@ app.get("/stats/all", function(req, res) {
                 allStats,
                 function(s, callback) {
                   console.log(s);
-                  requestTable.insert(s, function(err, results) {
-                    if (err) {
-                      console.log("Insert workout error");
-                      console.log(err);
-                      res.status(400).send(err);
-                    } else {
-                      console.log("Successful insert");
-                      console.log(results);
-                    }
-                  });
+                  // requestTable.insert(s, function(err, results) {
+                  //   if (err) {
+                  //     console.log("Insert workout error");
+                  //     console.log(err);
+                  //     res.status(400).send(err);
+                  //   } else {
+                  //     console.log("Successful insert");
+                  //     console.log(results);
+                  //   }
+                  // });
                 },
                 function(err, day) {
                   console.log(err);
