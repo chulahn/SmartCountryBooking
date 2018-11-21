@@ -1,4 +1,5 @@
 $(document).ready(function() {
+  $("#startModal").modal();
   $("#vizDiv2").hide();
   $(".yearDiv .btn > span").click(function() {
     var year = $(this).html();
@@ -82,6 +83,20 @@ angular
         $("#locationInput").val(location);
         $("#timeInput").val(time);
         $("#regModal").modal();
+      };
+
+      $scope.register = function() {
+        console.log("res");
+        var obj = {};
+        obj.service = $("#serviceInput").val();
+        obj.date = $("#dateInput").val();
+        obj.location = $("#locationInput").val();
+        obj.time = $("#timeInput").val();
+        $http.post("/sms", obj, function(req, res) {
+          $("#regModal").modal("toggle");
+          $("#registeredModal").modal("toggle");
+          console.log(res);
+        });
       };
 
       /*

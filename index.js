@@ -9,6 +9,8 @@ var ObjectId = require("mongodb").ObjectId;
 var request = require("request");
 var async = require("async");
 
+var twilio = require("twilio");
+
 var bodyParser = require("body-parser");
 app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(
@@ -294,6 +296,31 @@ app.get("/stats/all", function(req, res) {
       }
     }
   );
+});
+
+const accountSid = "AC158a18c88afd9974315afc095b5e5675";
+const authToken = "215b80a805b815ea08684fde29e7c1c8";
+const client = require("twilio")(accountSid, authToken);
+
+app.post("/sms", function(req, res) {
+  var data = req.body;
+  console.log(data);
+  client.messages
+    .create({
+      body:
+        "Hello.  Your " +
+        data.service +
+        " has been booked for " +
+        data.date +
+        " " +
+        data.time +
+        " at " +
+        data.location,
+      from: "+18565597078",
+      to: "+12672105999"
+    })
+    .then(message => console.log(message.sid))
+    .done();
 });
 
 app.get("/style.css", function(req, res) {
