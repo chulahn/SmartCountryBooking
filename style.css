@@ -1,9 +1,10 @@
 body {
-  background: rgb(74, 107, 199);
+  background: rgba(33, 119, 250, 0.6);
 }
 
 #vizDiv {
   background: white;
+  border-radius: 10px;
 }
 .time-row {
   border: 1px solid black;
@@ -57,6 +58,10 @@ body {
 }
 
 .avgLine {
-  fill: rgba(45, 119, 231, 0.2);
-  stroke: rgba(45, 119, 231, 0.2) !important;
+  stroke: rgba(72, 81, 183, 0.3) !important;
+}
+
+.clicked {
+  background: rgb(18, 177, 13) !important;
+  color: white !important;
 }

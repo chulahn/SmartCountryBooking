@@ -1,6 +1,11 @@
 $(document).ready(function() {
-  $(".graph-nav").click(function() {
+  $(".yearDiv .btn > span").click(function() {
+    console.log(1);
     var year = $(this).html();
+    $(".clicked").removeClass("clicked");
+    $(this)
+      .parent()
+      .addClass("clicked");
     $("#year").html(year);
 
     var scope = angular.element($("[ng-controller=dataController]")).scope();
