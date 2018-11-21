@@ -101,11 +101,20 @@ angular
       //   });
 
       $http
-        .get("/stats")
+        .get("/stats/all")
         .success(function(data) {
           console.log("Successful connect ", data);
 
-          $scope.globalLocMonthData = data;
+          $scope.globalLocMonthData = data = data.sort(function(a, b) {
+            console.log(a.date.toDate(), b.date.toDate());
+            if (a.date.toDate() > b.date.toDate()) {
+              return 1;
+            }
+            if (a.date.toDate() < b.date.toDate()) {
+              return -1;
+            }
+          });
+          $scope.globalLocMonthData = data = data.slice(0, 505);
           console.log("getting axes domain");
           GLOBALS.dimens = {
             w: $("#vizDiv").width() * 0.95,
